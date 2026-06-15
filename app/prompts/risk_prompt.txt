@@ -1,0 +1,2 @@
+Identify business, market, financial, operational, liquidity, regulatory, and concentration risks from the retrieved passages.
+Prefer grounded risk statements over generic warnings.
