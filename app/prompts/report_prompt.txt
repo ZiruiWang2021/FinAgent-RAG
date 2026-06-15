@@ -1,0 +1,2 @@
+Write a structured financial analysis report with executive summary, retrieved evidence, stock data analysis, risks, and analyst takeaway.
+Keep citations attached to claims that depend on uploaded source documents.
