@@ -20,6 +20,26 @@ class RetrievedChunk(SourceChunk):
     score: float = 0.0
 
 
+class Citation(BaseModel):
+    source: str
+    chunk_id: str
+    score: float
+    quote: str = Field(..., description="Short source excerpt used as evidence.")
+
+
+class ToolCallRecord(BaseModel):
+    tool_name: str
+    input: dict[str, Any] = Field(default_factory=dict)
+    output_summary: str
+    status: str = Field("success", examples=["success", "failed", "skipped"])
+
+
+class RiskItem(BaseModel):
+    name: str
+    severity: str = Field(..., examples=["low", "medium", "high", "unknown"])
+    evidence: str
+
+
 class UploadResponse(BaseModel):
     filename: str
     chunks_indexed: int
@@ -60,6 +80,16 @@ class StockAnalysisResponse(BaseModel):
     rows: int
 
 
+class StructuredReport(BaseModel):
+    title: str
+    executive_summary: str
+    key_findings: list[str] = Field(default_factory=list)
+    risks: list[RiskItem] = Field(default_factory=list)
+    citations: list[Citation] = Field(default_factory=list)
+    stock_metrics: StockMetrics | None = None
+    hallucination_controls: list[str] = Field(default_factory=list)
+
+
 class WorkflowStep(BaseModel):
     agent: str
     action: str
@@ -79,3 +109,41 @@ class ReportResponse(BaseModel):
     report: str
     sources: list[RetrievedChunk] = Field(default_factory=list)
     stock_analysis: StockMetrics | None = None
+    tool_calls: list[ToolCallRecord] = Field(default_factory=list)
+    structured_report: StructuredReport | None = None
+
+
+class DocumentSummary(BaseModel):
+    source: str
+    chunks: int
+
+
+class DocumentsResponse(BaseModel):
+    total_chunks: int
+    documents: list[DocumentSummary]
+
+
+class EvaluationCase(BaseModel):
+    case_id: str
+    question: str
+    expected_answer_points: list[str]
+    tags: list[str] = Field(default_factory=list)
+
+
+class EvaluationResult(BaseModel):
+    case_id: str
+    question: str
+    expected_answer_points: list[str]
+    matched_points: list[str]
+    missing_points: list[str]
+    source_count: int
+    groundedness_score: float
+    passed: bool
+    answer_preview: str
+
+
+class EvaluationResponse(BaseModel):
+    total_cases: int
+    passed_cases: int
+    average_groundedness_score: float
+    results: list[EvaluationResult]
