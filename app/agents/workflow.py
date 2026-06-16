@@ -8,7 +8,7 @@ from app.agents.report_agent import ReportAgent
 from app.agents.retriever_agent import RetrieverAgent
 from app.agents.risk_agent import RiskAgent
 from app.rag.retriever import RagService
-from app.schemas.models import ReportResponse, StockMetrics, WorkflowStep
+from app.schemas.models import ReportResponse, StockMetrics, ToolCallRecord, WorkflowStep
 from app.tools.stock_data_tool import StockDataTool
 
 
@@ -22,6 +22,7 @@ class AgentWorkflow:
 
     def run(self, question: str, ticker: str | None = None, top_k: int = 4) -> ReportResponse:
         steps: list[WorkflowStep] = []
+        tool_calls: list[ToolCallRecord] = []
 
         plan = self.planner.run(question=question, ticker=ticker)
         steps.append(
@@ -33,6 +34,14 @@ class AgentWorkflow:
         )
 
         sources = self.retriever.run(question=question, top_k=top_k)
+        tool_calls.append(
+            ToolCallRecord(
+                tool_name="document_retriever",
+                input={"question": question, "top_k": top_k},
+                output_summary=f"Retrieved {len(sources)} chunks from the document index.",
+                status="success",
+            )
+        )
         steps.append(
             WorkflowStep(
                 agent=self.retriever.name,
@@ -52,6 +61,23 @@ class AgentWorkflow:
                 )
             except Exception as exc:  # pragma: no cover
                 data_output = f"Stock analysis failed: {exc}"
+                tool_calls.append(
+                    ToolCallRecord(
+                        tool_name="stock_data_tool",
+                        input={"ticker": ticker, "period": "6mo"},
+                        output_summary=data_output,
+                        status="failed",
+                    )
+                )
+            else:
+                tool_calls.append(
+                    ToolCallRecord(
+                        tool_name="stock_data_tool",
+                        input={"ticker": ticker, "period": "6mo"},
+                        output_summary=data_output,
+                        status="success",
+                    )
+                )
 
             steps.append(
                 WorkflowStep(
@@ -65,6 +91,12 @@ class AgentWorkflow:
         steps.append(WorkflowStep(agent=self.risk.name, action="Summarize risk factors", output=risks))
 
         report = self.report.run(question=question, sources=sources, risks=risks, stock_analysis=stock_analysis)
+        structured_report = self.report.build_structured_report(
+            question=question,
+            sources=sources,
+            risks=risks,
+            stock_analysis=stock_analysis,
+        )
         steps.append(WorkflowStep(agent=self.report.name, action="Generate structured report", output="Report generated."))
 
         return ReportResponse(
@@ -74,4 +106,6 @@ class AgentWorkflow:
             report=report,
             sources=sources,
             stock_analysis=stock_analysis,
+            tool_calls=tool_calls,
+            structured_report=structured_report,
         )
