@@ -38,15 +38,19 @@ class RagRetriever:
 
 
 class RagService:
-    def __init__(self, retriever: RagRetriever):
+    def __init__(self, retriever: RagRetriever, min_relevance_score: float = 0.18):
         self.retriever = retriever
+        self.min_relevance_score = min_relevance_score
 
     @property
     def vector_store(self) -> InMemoryVectorStore:
         return self.retriever.vector_store
 
     def answer(self, question: str, top_k: int = 4) -> AskResponse:
-        sources = self.retriever.retrieve(question, top_k=top_k)
+        sources = [
+            source for source in self.retriever.retrieve(question, top_k=top_k)
+            if source.score >= self.min_relevance_score
+        ]
         answer = self._synthesize_answer(question, sources)
         return AskResponse(question=question, answer=answer, sources=sources)
 
