@@ -1,151 +1,152 @@
 # FinAgent-RAG
 
-FinAgent-RAG is a production-oriented multi-agent RAG system for financial research reports, company announcements, and stock market data.
+FinAgent-RAG is an AI Native financial information and research workflow. It combines RAG, agent orchestration, prompt templates, tool calling, structured output validation, and evaluation checks in a compact full-stack project.
 
-FinAgent-RAG 是一个面向金融研报、公司公告和股票数据的多 Agent 智能分析系统，重点展示 RAG、工具调用、任务编排、数据分析、API 服务和前端交互的完整工程实现。
+FinAgent-RAG 是一个 AI Native 金融资讯与研究分析系统。项目将 RAG、多 Agent 工作流、Prompt Engineering、工具调用、结构化输出校验和模型评估整合在一个简洁的全栈工程中。
 
 > This project is for engineering demonstration and research workflow prototyping only. It is not investment advice.  
 > 本项目仅用于工程实践展示和研究流程原型验证，不构成任何投资建议。
 
-## Project Highlights / 项目亮点
+## Positioning / 项目定位
 
-- **Multi-agent workflow / 多 Agent 工作流**: Planner, Retriever, Data, Risk, and Report agents cooperate to complete an end-to-end financial analysis task.
-- **Source-grounded RAG / 基于来源的 RAG**: uploaded documents are extracted, chunked, embedded, retrieved, and cited in answers.
-- **Tool calling / 工具调用**: the Data Agent calls a stock data tool backed by `yfinance`.
-- **Financial metrics / 金融指标计算**: 1-month return, annualized volatility, MA20, MA60, maximum drawdown, and trend signal.
-- **FastAPI backend / FastAPI 后端**: modular API routers with Pydantic request and response schemas.
-- **Streamlit frontend / Streamlit 前端**: document upload, question answering, stock analysis, workflow trace, and final report in one demo UI.
-- **Evaluation examples / 评估样例**: controlled sample document and tests help check retrieval quality and reduce hallucination risk.
-- **Extensible structure / 可扩展结构**: local hashing embeddings can be replaced with OpenAI embeddings, FAISS, Chroma, pgvector, LangChain, or LlamaIndex.
+The system targets financial document Q&A and market-data-assisted research. Users can upload reports or announcements, ask source-grounded questions, inspect citations, run an agent workflow, review tool calls, generate a structured report, and run simple evaluation cases.
 
-## Use Cases / 适用场景
+系统面向金融文档问答和股票数据辅助研究。用户可以上传研报或公告，进行带引用来源的问答，查看 Agent 执行步骤和工具调用记录，生成结构化报告，并运行简单评估集检查回答质量。
 
-- Summarize company research reports and announcements.  
-  汇总公司研报和公告中的关键信息。
-- Answer questions about business model, industry drivers, financial performance, and risks.  
-  回答商业模式、行业驱动、财务表现和风险因素相关问题。
-- Combine document evidence with market data analysis.  
-  将文档证据与股票市场数据分析结合起来。
-- Prototype enterprise AI workflows that need retrieval, tool calling, and report generation.  
-  原型验证需要检索、工具调用和报告生成的企业级 AI 工作流。
+## Architecture / 架构
+
+```text
+React + TypeScript UI
+  |-- document upload
+  |-- RAG Q&A
+  |-- citations
+  |-- agent steps
+  |-- tool calls
+  |-- structured report JSON
+  `-- evaluation panel
+
+FastAPI backend
+  |-- /upload
+  |-- /documents
+  |-- /ask
+  |-- /analyze-stock
+  |-- /generate-report
+  |-- /evaluation-cases
+  `-- /evaluate
+
+Core modules
+  |-- RAG: document_loader -> chunker -> embeddings -> vector_store -> retriever
+  |-- Agents: Planner -> Retriever -> Data -> Risk -> Report
+  |-- Tools: stock data tool, financial metrics, chart data helper
+  |-- Schemas: Pydantic validation for API and structured report output
+  `-- Evaluation: expected answer points, source coverage, groundedness score
+```
+
+## Features / 功能
+
+- Upload `txt`, `md`, and `pdf` documents.  
+  支持上传 `txt`、`md` 和 `pdf` 文档。
+- Run RAG Q&A with citations and retrieval scores.  
+  支持带引用来源和检索分数的 RAG 问答。
+- Generate a multi-agent report with observable workflow steps.  
+  支持生成包含 Agent 步骤的多 Agent 分析报告。
+- Record tool calls, including document retrieval and stock data analysis.  
+  记录工具调用，包括文档检索和股票数据分析。
+- Validate structured output using Pydantic schemas.  
+  使用 Pydantic schema 校验结构化输出。
+- Evaluate answer quality using at least 5 controlled test questions.  
+  使用至少 5 个测试问题和期望答案要点评估回答质量。
+- Apply basic hallucination control through source thresholds, citations, and unknown-answer evaluation.  
+  通过相关性阈值、引用来源和未知问题评估进行基础 hallucination 控制。
 
 ## Tech Stack / 技术栈
 
-- Python
-- FastAPI
-- Streamlit
-- Pydantic
-- pandas / numpy
-- yfinance
-- pypdf
-- pytest
-
-The current retriever uses deterministic hashing embeddings so the project runs without API keys or model downloads. In production, the `app/rag/` boundary can be replaced with OpenAI embeddings, SentenceTransformers, FAISS, Chroma, pgvector, LangChain, or LlamaIndex.
-
-当前检索器使用确定性的 hashing embedding，因此无需 API key 或模型下载即可运行。生产环境中可以在 `app/rag/` 边界替换为 OpenAI Embeddings、SentenceTransformers、FAISS、Chroma、pgvector、LangChain 或 LlamaIndex。
+- Backend: Python, FastAPI, Pydantic
+- RAG: local hashing embeddings, in-memory vector store
+- Agents: lightweight Planner / Retriever / Data / Risk / Report workflow
+- Tools: yfinance, pandas, numpy
+- Frontend: React, TypeScript, Vite
+- Demo UI: Streamlit retained as a secondary lightweight interface
+- Testing: pytest, FastAPI TestClient
 
 ## Repo Structure / 项目结构
 
 ```text
 finagent-rag/
 |-- app/
-|   |-- main.py
 |   |-- api/
-|   |   |-- upload.py
-|   |   |-- ask.py
-|   |   |-- stock.py
-|   |   `-- report.py
 |   |-- agents/
-|   |   |-- planner_agent.py
-|   |   |-- retriever_agent.py
-|   |   |-- data_agent.py
-|   |   |-- risk_agent.py
-|   |   |-- report_agent.py
-|   |   `-- workflow.py
-|   |-- rag/
-|   |   |-- document_loader.py
-|   |   |-- chunker.py
-|   |   |-- embeddings.py
-|   |   |-- vector_store.py
-|   |   `-- retriever.py
-|   |-- tools/
-|   |   |-- stock_data_tool.py
-|   |   |-- financial_metrics.py
-|   |   `-- chart_tool.py
+|   |-- evaluation/
 |   |-- prompts/
-|   |   |-- planner_prompt.txt
-|   |   |-- rag_prompt.txt
-|   |   |-- risk_prompt.txt
-|   |   `-- report_prompt.txt
-|   `-- schemas/
-|       `-- models.py
+|   |-- rag/
+|   |-- schemas/
+|   |-- tools/
+|   |-- dependencies.py
+|   `-- main.py
+|-- frontend-react/
+|   |-- src/
+|   |-- package.json
+|   `-- vite.config.ts
 |-- frontend/
 |   `-- streamlit_app.py
 |-- data/
 |   |-- sample_docs/
+|   |-- uploads/
 |   `-- vector_store/
 |-- tests/
-|   |-- test_chunker.py
-|   |-- test_stock_tool.py
-|   |-- test_retriever.py
-|   `-- test_api.py
-|-- README.md
 |-- requirements.txt
-|-- .env.example
-|-- .gitignore
-`-- run_demo.md
+|-- run_demo.md
+`-- README.md
 ```
 
-## Architecture / 架构说明
+## API / 接口
 
-```text
-User / 用户
-  |
-  | Streamlit frontend / 前端交互
-  v
-FastAPI backend / 后端服务
-  |
-  +-- POST /upload
-  |     document_loader -> chunker -> embeddings -> vector_store
-  |     文档加载 -> 文本切分 -> 向量化 -> 向量检索库
-  |
-  +-- POST /ask
-  |     retriever -> source-grounded RAG answer
-  |     检索器 -> 带引用来源的 RAG 回答
-  |
-  +-- POST /analyze-stock
-  |     stock_data_tool -> financial_metrics
-  |     股票数据工具 -> 金融指标计算
-  |
-  +-- POST /generate-report
-        Planner Agent  / 任务规划
-          -> Retriever Agent / 文档检索
-          -> Data Agent      / 数据分析
-          -> Risk Agent      / 风险总结
-          -> Report Agent    / 报告生成
-```
+| Method | Endpoint | Purpose |
+|---|---|---|
+| `GET` | `/health` | Service health and indexed chunk count |
+| `POST` | `/upload` | Upload and index txt/md/pdf documents |
+| `GET` | `/documents` | List indexed documents and chunk counts |
+| `POST` | `/ask` | RAG Q&A with citations |
+| `POST` | `/analyze-stock` | Stock metrics via yfinance |
+| `POST` | `/generate-report` | Agent workflow, tool calls, structured report |
+| `GET` | `/evaluation-cases` | Built-in evaluation questions |
+| `POST` | `/evaluate` | Run evaluation against the current document index |
 
-## Core Features / 核心功能
+## Structured Output / 结构化输出
 
-1. Upload `txt`, `md`, and `pdf` documents.  
-   支持上传 `txt`、`md` 和 `pdf` 文档。
-2. Extract text, chunk documents, embed chunks, and retrieve relevant passages.  
-   支持文本抽取、chunking、embedding 和相关片段检索。
-3. Answer company, industry, risk, business model, and financial performance questions with citations.  
-   支持围绕公司、行业、风险、商业模式和财务表现进行带引用回答。
-4. Analyze stock data with return, volatility, moving averages, drawdown, and trend.  
-   支持股票收益率、波动率、均线、最大回撤和趋势判断。
-5. Run a multi-agent workflow with observable intermediate steps.  
-   支持可观察的多 Agent 工作流步骤。
-6. Provide both API and UI entry points.  
-   同时提供 API 和前端界面入口。
+`/generate-report` returns both markdown text and validated JSON:
 
-## Installation / 安装
+- `steps`: agent workflow trace
+- `tool_calls`: tool name, input, status, output summary
+- `sources`: retrieved chunks
+- `structured_report`: title, executive summary, findings, risks, citations, stock metrics, hallucination controls
+
+`/generate-report` 同时返回 markdown 报告和结构化 JSON，便于前端展示、自动评估和后续系统集成。
+
+## Evaluation / 评估
+
+The evaluation module contains 5 built-in cases:
+
+1. Growth drivers
+2. Business quality
+3. Risk factors
+4. Cost or margin pressure
+5. Unknown dividend policy for hallucination control
+
+评估模块会检查：
+
+- expected answer point matching / 期望答案要点命中
+- source count / 引用来源数量
+- groundedness score / 基于来源的回答分数
+- unknown-answer behavior / 未知问题拒答能力
+
+## Run Backend / 启动后端
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
+uvicorn app.main:app --reload --port 8000
 ```
 
 Windows PowerShell:
@@ -154,96 +155,56 @@ Windows PowerShell:
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
-```
-
-## Run the Backend / 启动后端
-
-```bash
 uvicorn app.main:app --reload --port 8000
 ```
 
-Health check / 健康检查:
+## Run React Frontend / 启动 React 前端
 
 ```bash
-curl http://localhost:8000/health
+cd frontend-react
+npm install
+npm run dev
 ```
 
-## Run the Frontend / 启动前端
+Open `http://127.0.0.1:5173`.
 
-In a second terminal / 在第二个终端中运行:
+打开 `http://127.0.0.1:5173`。
+
+## Run Streamlit Demo / 启动 Streamlit Demo
 
 ```bash
 streamlit run frontend/streamlit_app.py
 ```
 
-Open the Streamlit URL shown in the terminal, usually `http://localhost:8501`.  
-打开终端中显示的 Streamlit 地址，通常是 `http://localhost:8501`。
+## Demo Flow / 演示流程
 
-## API Examples / API 示例
+1. Start FastAPI backend.  
+   启动 FastAPI 后端。
+2. Start React frontend.  
+   启动 React 前端。
+3. Upload `data/sample_docs/demo_company.md`.  
+   上传样例文档。
+4. Ask: `What drives ACME revenue growth?`  
+   提问：`ACME 的收入增长由什么驱动？`
+5. Generate an agent report with ticker `AAPL`.  
+   使用 `AAPL` 生成 Agent 报告。
+6. Review citations, agent steps, tool calls, and structured report JSON.  
+   查看引用来源、Agent 步骤、工具调用和结构化报告 JSON。
+7. Run evaluation and inspect matched or missing answer points.  
+   运行评估并检查命中或缺失的答案要点。
 
-Upload a document / 上传文档:
+## Role Fit / 岗位匹配点
 
-```bash
-curl -X POST http://localhost:8000/upload \
-  -F "file=@data/sample_docs/demo_company.md"
-```
-
-Ask a RAG question / 提问:
-
-```bash
-curl -X POST http://localhost:8000/ask \
-  -H "Content-Type: application/json" \
-  -d '{"question":"What are ACME growth drivers and risks?","top_k":4}'
-```
-
-Analyze a stock / 分析股票:
-
-```bash
-curl -X POST http://localhost:8000/analyze-stock \
-  -H "Content-Type: application/json" \
-  -d '{"ticker":"AAPL","period":"6mo"}'
-```
-
-Generate a report / 生成报告:
-
-```bash
-curl -X POST http://localhost:8000/generate-report \
-  -H "Content-Type: application/json" \
-  -d '{"question":"Analyze ACME business drivers, financial performance, and key risks.","ticker":"AAPL","top_k":4}'
-```
-
-## Demo Questions / Demo 问题
-
-- What are the main revenue growth drivers?  
-  主要收入增长驱动因素是什么？
-- What risks does the company disclose?  
-  公司披露了哪些风险？
-- How does the company describe its business model?  
-  公司如何描述其商业模式？
-- What financial performance trend is mentioned in the report?  
-  报告中提到了哪些财务表现趋势？
-- What industry headwinds or regulatory risks should investors monitor?  
-  需要关注哪些行业压力或监管风险？
-- Generate a structured report and include market data for `AAPL`.  
-  生成结构化报告，并加入 `AAPL` 的市场数据分析。
-
-## Evaluation Examples / 评估样例
-
-Use `data/sample_docs/demo_company.md` as a small controlled document set.  
-可以使用 `data/sample_docs/demo_company.md` 作为小型可控文档集。
-
-- Ask: `What drives ACME revenue growth?`  
-  提问：`ACME 的收入增长由什么驱动？`
-  - Expected evidence should mention cloud software subscriptions and enterprise customer expansion.  
-    期望证据应提到云软件订阅和企业客户扩张。
-- Ask: `What are ACME's main risks?`  
-  提问：`ACME 的主要风险是什么？`
-  - Expected evidence should mention competition, customer concentration, sales cycle uncertainty, or margin pressure.  
-    期望证据应提到竞争、客户集中度、销售周期不确定性或利润率压力。
-- Ask: `What is ACME's dividend policy?`  
-  提问：`ACME 的分红政策是什么？`
-  - Expected behavior should be cautious because the sample document does not contain this information.  
-    由于样例文档不包含该信息，系统应给出谨慎回答。
+- **AI Native 金融资讯系统**: combines financial documents, market data, RAG Q&A, and report generation.
+- **RAG**: document ingestion, chunking, embeddings, vector retrieval, citation display.
+- **Agent Workflow**: Planner, Retriever, Data, Risk, and Report agents with observable steps.
+- **Prompt Engineering**: separate prompt files for planning, RAG answering, risk reasoning, and reporting.
+- **FastAPI**: modular routers, typed request/response models, CORS, testable app factory.
+- **React + TypeScript**: typed frontend consuming backend APIs and rendering workflow state.
+- **工具调用**: stock data tool and document retriever logged as tool calls.
+- **结构化输出**: Pydantic `StructuredReport`, `Citation`, `RiskItem`, and `ToolCallRecord`.
+- **模型评估**: built-in evaluation cases with expected answer points and groundedness scoring.
+- **Hallucination 控制**: source thresholds, citations, insufficient-evidence behavior, unknown-answer evaluation.
 
 ## Tests / 测试
 
@@ -251,24 +212,21 @@ Use `data/sample_docs/demo_company.md` as a small controlled document set.
 pytest
 ```
 
-The test suite covers / 测试覆盖:
+Current tests cover:
 
-- document chunking / 文档切分
-- retrieval relevance / 检索相关性
-- stock indicator calculations / 股票指标计算
-- FastAPI upload, RAG answer, stock analysis, and report generation / FastAPI 上传、RAG 回答、股票分析和报告生成
+- chunking
+- retrieval relevance
+- stock metrics
+- API upload and RAG answer
+- structured report and tool calls
+- documents API
+- evaluation API
 
 ## Extension Ideas / 后续扩展
 
-- Replace local hashing embeddings with OpenAI embeddings plus FAISS or Chroma.  
-  将本地 hashing embedding 替换为 OpenAI Embeddings + FAISS 或 Chroma。
-- Add persistent document collections and metadata filters by company, date, sector, and document type.  
-  增加持久化文档库，并按公司、日期、行业、文档类型过滤。
-- Use LangGraph or CrewAI for richer multi-agent planning, retries, and state transitions.  
-  使用 LangGraph 或 CrewAI 扩展多 Agent 状态流转、重试和计划能力。
-- Add SEC filing ingestion, earnings transcript parsing, and scheduled market data refresh.  
-  增加 SEC 文件解析、业绩会文字稿解析和定时市场数据刷新。
-- Add structured evaluation datasets for retrieval quality, citation coverage, and hallucination detection.  
-  增加结构化评估集，用于检索质量、引用覆盖率和幻觉检测。
-- Add authentication, rate limiting, background jobs, observability, and deployment manifests.  
-  增加认证、限流、后台任务、可观测性和部署配置。
+- Replace hashing embeddings with OpenAI embeddings, bge, FAISS, Chroma, or pgvector.
+- Add LangGraph for explicit graph state and retry control.
+- Add real LLM calls with JSON mode or function calling.
+- Add SEC filing ingestion and scheduled financial news collection.
+- Add CI workflow for backend tests and frontend build.
+- Add retrieval metrics such as recall@k, MRR, citation precision, and answer faithfulness.
