@@ -160,6 +160,10 @@ uvicorn app.main:app --reload --port 8000
 
 ## Run React Frontend / 启动 React 前端
 
+Requires Node.js `>=20.19.0` because the React app uses Vite 7.
+
+React 前端使用 Vite 7，建议 Node.js 版本 `>=20.19.0`。
+
 ```bash
 cd frontend-react
 npm install
@@ -192,6 +196,26 @@ streamlit run frontend/streamlit_app.py
    查看引用来源、Agent 步骤、工具调用和结构化报告 JSON。
 7. Run evaluation and inspect matched or missing answer points.  
    运行评估并检查命中或缺失的答案要点。
+
+## Demo Screenshots / 演示截图
+
+Screenshots can be added under `docs/screenshots/` after running the local demo.
+
+本地运行 demo 后，可以将截图放到 `docs/screenshots/` 目录。
+
+| View / 页面 | Suggested File / 建议文件名 | Status / 状态 |
+|---|---|---|
+| FastAPI docs | `docs/screenshots/api-docs.png` | Placeholder |
+| React upload and RAG Q&A | `docs/screenshots/react-rag-qa.png` | Placeholder |
+| Agent steps and tool calls | `docs/screenshots/agent-workflow.png` | Placeholder |
+| Structured report JSON | `docs/screenshots/structured-report.png` | Placeholder |
+| Evaluation results | `docs/screenshots/evaluation-results.png` | Placeholder |
+
+## Supporting Documents / 补充文档
+
+- [Three minute demo script](docs/three_minute_demo_script.md)
+- [Interview talking points](docs/interview_talking_points.md)
+- [Recruiter summary](docs/recruiter_summary.md)
 
 ## Engineering Notes / 工程设计说明
 
