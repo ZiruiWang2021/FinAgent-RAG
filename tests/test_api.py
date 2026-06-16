@@ -70,3 +70,39 @@ def test_generate_report_api_returns_agent_steps():
     body = response.json()
     assert len(body["steps"]) >= 4
     assert "FinAgent-RAG Analysis Report" in body["report"]
+    assert body["tool_calls"]
+    assert body["structured_report"]["citations"]
+
+
+def test_documents_and_evaluation_api():
+    app = create_app()
+    client = TestClient(app)
+
+    client.post(
+        "/upload",
+        files={
+            "file": (
+                "demo_company.md",
+                (
+                    b"ACME revenue growth is driven by cloud software subscriptions and enterprise customer expansion. "
+                    b"The company benefits from recurring revenue, high renewal rates, and operating leverage. "
+                    b"Key risks include competition, customer concentration, sales cycle uncertainty, and margin pressure from infrastructure costs."
+                ),
+                "text/markdown",
+            )
+        },
+    )
+
+    documents = client.get("/documents")
+    assert documents.status_code == 200
+    assert documents.json()["total_chunks"] >= 1
+
+    cases = client.get("/evaluation-cases")
+    assert cases.status_code == 200
+    assert len(cases.json()) >= 5
+
+    evaluation = client.post("/evaluate")
+    assert evaluation.status_code == 200
+    body = evaluation.json()
+    assert body["total_cases"] >= 5
+    assert "average_groundedness_score" in body
