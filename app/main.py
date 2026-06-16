@@ -5,7 +5,7 @@ from __future__ import annotations
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import ask, report, stock, upload
+from app.api import ask, documents, evaluation, report, stock, upload
 from app.config import ensure_data_dirs, settings
 from app.dependencies import create_container
 
@@ -35,9 +35,11 @@ def create_app() -> FastAPI:
         }
 
     api.include_router(upload.router)
+    api.include_router(documents.router)
     api.include_router(ask.router)
     api.include_router(stock.router)
     api.include_router(report.router)
+    api.include_router(evaluation.router)
     return api
 
 
