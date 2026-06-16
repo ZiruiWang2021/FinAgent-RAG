@@ -33,10 +33,18 @@ curl http://localhost:8000/health
 
 ## 3. Start Streamlit / 启动前端
 
-In another terminal / 在另一个终端中运行:
+Streamlit lightweight demo / Streamlit 轻量 demo:
 
 ```bash
 streamlit run frontend/streamlit_app.py
+```
+
+React + TypeScript frontend / React + TypeScript 前端:
+
+```bash
+cd frontend-react
+npm install
+npm run dev
 ```
 
 ## 4. Demo Flow / 演示流程
@@ -49,10 +57,12 @@ streamlit run frontend/streamlit_app.py
    提问：`主要风险是什么？`
 4. Enter ticker `AAPL` and click `Analyze Stock`.  
    输入股票代码 `AAPL`，点击 `Analyze Stock / 分析股票`。
-5. Click `Run Agent Workflow`.  
-   点击 `Run Agent Workflow / 运行 Agent 工作流`。
-6. Review retrieved sources, stock metrics, agent steps, and final report.  
-   查看检索来源、股票指标、Agent 步骤和最终报告。
+5. Click `Generate Agent Report`.  
+   点击生成 Agent 报告。
+6. Review retrieved sources, stock metrics, agent steps, tool calls, structured JSON, and final report.  
+   查看检索来源、股票指标、Agent 步骤、工具调用、结构化 JSON 和最终报告。
+7. Run evaluation to inspect expected answer point coverage.  
+   运行评估，查看期望答案要点覆盖情况。
 
 ## 5. API-Only Demo / 仅使用 API 的演示
 
