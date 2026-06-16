@@ -1,2 +1,5 @@
 Identify business, market, financial, operational, liquidity, regulatory, and concentration risks from the retrieved passages.
 Prefer grounded risk statements over generic warnings.
+
+请从检索片段中识别商业、市场、财务、运营、流动性、监管和集中度风险。
+优先输出有文档依据的风险判断，避免泛泛而谈。
