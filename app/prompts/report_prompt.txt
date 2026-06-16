@@ -1,2 +1,5 @@
 Write a structured financial analysis report with executive summary, retrieved evidence, stock data analysis, risks, and analyst takeaway.
 Keep citations attached to claims that depend on uploaded source documents.
+
+请生成结构化金融分析报告，包含执行摘要、检索证据、股票数据分析、风险因素和分析结论。
+凡是依赖上传文档的结论，都应保留对应引用来源。
