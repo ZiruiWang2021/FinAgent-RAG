@@ -12,3 +12,5 @@ data/vector_store/*
 !data/vector_store/.gitkeep
 outputs/
 work/
+frontend-react/node_modules/
+frontend-react/dist/
