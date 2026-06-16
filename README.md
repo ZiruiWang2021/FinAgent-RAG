@@ -4,8 +4,8 @@ FinAgent-RAG is an AI Native financial information and research workflow. It com
 
 FinAgent-RAG 是一个 AI Native 金融资讯与研究分析系统。项目将 RAG、多 Agent 工作流、Prompt Engineering、工具调用、结构化输出校验和模型评估整合在一个简洁的全栈工程中。
 
-> This project is for engineering demonstration and research workflow prototyping only. It is not investment advice.  
-> 本项目仅用于工程实践展示和研究流程原型验证，不构成任何投资建议。
+> This repository is a research workflow prototype. It is not investment advice.  
+> 本仓库用于研究流程原型验证，不构成任何投资建议。
 
 ## Positioning / 项目定位
 
@@ -193,18 +193,19 @@ streamlit run frontend/streamlit_app.py
 7. Run evaluation and inspect matched or missing answer points.  
    运行评估并检查命中或缺失的答案要点。
 
-## Role Fit / 岗位匹配点
+## Engineering Notes / 工程设计说明
 
-- **AI Native 金融资讯系统**: combines financial documents, market data, RAG Q&A, and report generation.
-- **RAG**: document ingestion, chunking, embeddings, vector retrieval, citation display.
-- **Agent Workflow**: Planner, Retriever, Data, Risk, and Report agents with observable steps.
-- **Prompt Engineering**: separate prompt files for planning, RAG answering, risk reasoning, and reporting.
-- **FastAPI**: modular routers, typed request/response models, CORS, testable app factory.
-- **React + TypeScript**: typed frontend consuming backend APIs and rendering workflow state.
-- **工具调用**: stock data tool and document retriever logged as tool calls.
-- **结构化输出**: Pydantic `StructuredReport`, `Citation`, `RiskItem`, and `ToolCallRecord`.
-- **模型评估**: built-in evaluation cases with expected answer points and groundedness scoring.
-- **Hallucination 控制**: source thresholds, citations, insufficient-evidence behavior, unknown-answer evaluation.
+FinAgent-RAG is organized as a small but complete financial research system instead of a single chat endpoint. The backend separates document ingestion, retrieval, stock-data tooling, agent orchestration, schemas, and evaluation, so each module can be tested and replaced independently.
+
+FinAgent-RAG 按照一个小型但完整的金融研究系统来组织，而不是单一聊天接口。后端将文档处理、检索、股票数据工具、Agent 编排、schema 和评估模块拆开，方便独立测试和后续替换。
+
+The RAG layer keeps answers grounded through chunk-level retrieval scores and citations. The report workflow records both agent steps and tool calls, making it easier to inspect how a final answer was assembled.
+
+RAG 层通过文本块级别的检索分数和引用来源约束回答。报告工作流会记录 Agent 步骤和工具调用，便于追踪最终结论是如何生成的。
+
+Structured reports are validated with Pydantic before being returned to the frontend. The evaluation module uses fixed questions, expected answer points, source coverage, and unknown-answer behavior to catch basic retrieval or hallucination issues.
+
+结构化报告在返回前端前会经过 Pydantic 校验。评估模块使用固定问题、期望答案要点、来源覆盖和未知问题处理，检查基础检索质量与 hallucination 风险。
 
 ## Tests / 测试
 
